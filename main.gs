@@ -12,7 +12,7 @@ function onFormSubmit(e) {
     webhookSheet.getRange(lastRowWebhook, 1, 1, newRow.length).setValues([newRow]);
 
     // Set formula in Column E and F
-    webhookSheet.getRange(lastRowWebhook, 5).setFormula("=ROW()");
+    webhookSheet.getRange(lastRowWebhook, 5).setFormula('"KAYBE-00"&=ROW()-2');
     var formulaF = '=IFERROR(RIGHT(D' + lastRowWebhook + ', FIND("?id=", D' + lastRowWebhook + ') - 1),"")';
     webhookSheet.getRange(lastRowWebhook, 6).setFormula(formulaF);
 
@@ -33,7 +33,7 @@ function onFormSubmit(e) {
                 newRowValues[6] = true;
                 webhookSheet.appendRow(newRowValues);
                 lastRowWebhook = webhookSheet.getLastRow();
-                webhookSheet.getRange(lastRowWebhook, 5).setFormula("=ROW()");
+                webhookSheet.getRange(lastRowWebhook, 5).setFormula('"KAYBE-00"&=ROW()-2');
                 var formulaF = '=IFERROR(RIGHT(D' + lastRowWebhook + ', FIND("?id=", D' + lastRowWebhook + ') - 1),"")';
                 webhookSheet.getRange(lastRowWebhook, 6).setFormula(formulaF);
                 webhookSheet.getRange(lastRowWebhook, 7).setValue(true); // Setting column G to TRUE
