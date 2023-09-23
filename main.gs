@@ -7,24 +7,27 @@ function onFormSubmit(e) {
   var range = formSubmissionSheet.getRange(lastRow, 1, 1, lastColumn);
   var values = range.getValues();
   var newRow = values[0];
-  
+
   // Get 'Processed' sheet
   var processedSheet = e.source.getSheetByName('Processed');
-  
+
   var colWithFilePaths = newRow[newRow.length - 1]; // Assuming the last column contains the file paths.
-  
+
   // If the last column is empty or contains one value
-  if (!colWithFilePaths || (colWithFilePaths.split(',').length === 1)) {
+  if (!colWithFilePaths) {
     processedSheet.appendRow(newRow); // Append the row to 'Processed' sheet
-  }
-  // If the last column contains more than one value after splitting by ','
-  else {
+    processedSheet.getRange(processedSheet.getLastRow(), 6).setValue(true); // Setting column F to TRUE
+  } else if (colWithFilePaths.split(',').length === 1) {
+    processedSheet.appendRow(newRow); // Append the row to 'Processed' sheet
+    processedSheet.getRange(processedSheet.getLastRow(), 6).setValue(true); // Setting column F to TRUE
+  } else { // If the last column contains more than one value after splitting by ','
     var splitValues = colWithFilePaths.split(',');
-    splitValues.forEach(function(value) {
+    splitValues.forEach(function (value) {
       // Make a copy of the newRow array
       var newRowValues = newRow.slice();
       newRowValues[newRowValues.length - 1] = value.trim(); // Update the value in the last column
       processedSheet.appendRow(newRowValues); // Append the new row to the 'Processed' sheet
+      processedSheet.getRange(processedSheet.getLastRow(), 6).setValue(true); // Setting column F to TRUE
     });
   }
 }
