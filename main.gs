@@ -1,6 +1,6 @@
 function onFormSubmit(e) {
   // Get 'Form Submission 1' sheet
-  var formSubmissionSheet = e.source.getSheetByName('Form Submission 1');
+  var formSubmissionSheet = e.source.getSheetByName('Form responses 1');
   // Get the last row data from 'Form Submission 1'
   var lastRow = formSubmissionSheet.getLastRow();
   var lastColumn = formSubmissionSheet.getLastColumn();
