@@ -30,7 +30,7 @@ function onFormSubmit(e) {
     var row = processedSheet.getLastRow() - 1;
     var invoiceNumber = "SUP-INV" + ("00000" + row).slice(-6);
     processedSheet.getRange(processedSheet.getLastRow(), 5).setValue(invoiceNumber);
-    
+    processedSheet.getRange(processedSheet.getLastRow(), 6).setValue('test');
     // Set the value in the 8th column (H) of the last row in the 'Processed' sheet as true,
     // indicating the row has been processed.
     processedSheet.getRange(processedSheet.getLastRow(), 8).setValue(true);
@@ -41,7 +41,7 @@ function onFormSubmit(e) {
     var row = processedSheet.getLastRow() - 1;
     var invoiceNumber = "SUP-INV" + ("00000" + row).slice(-6);
     processedSheet.getRange(processedSheet.getLastRow(), 5).setValue(invoiceNumber);
-    
+    processedSheet.getRange(processedSheet.getLastRow(), 6).setValue('test');
     // Extract the file ID from the file path using the split method,
     // and assign it to the 7th column (G) of the last row in the 'Processed' sheet.
     var fileID = colWithFilePaths.split("?id=");
@@ -65,7 +65,7 @@ function onFormSubmit(e) {
       var row = processedSheet.getLastRow() - 1;
       var invoiceNumber = "SUP-INV" + ("00000" + row).slice(-6);
       processedSheet.getRange(processedSheet.getLastRow(), 5).setValue(invoiceNumber);
-      
+      processedSheet.getRange(processedSheet.getLastRow(), 6).setValue('test');
       // Extract the file ID from each file path, and assign it to the corresponding row in 'Processed' sheet.
       var parts = splitValues[i];
       var fileID = parts.split("?id=");
