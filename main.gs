@@ -29,13 +29,14 @@ function onFormSubmit(e) {
     var invoiceNumber = "SUP-INV" + ("00000" + row).slice(-6);
     processedSheet.getRange(processedSheet.getLastRow(), 5).setValue(invoiceNumber); // Col E
 
-  var fileID = colWithFilePaths.split("?id=");
-  processedSheet.getRange(processedSheet.getLastRow(), 7).setValue(fileID[1]); // Col G
+    var fileID = colWithFilePaths.split("?id=");
+    processedSheet.getRange(processedSheet.getLastRow(), 7).setValue(fileID[1]); // Col G
 
     processedSheet.getRange(processedSheet.getLastRow(), 8).setValue(true); // Col H
 
   } else { // More than one file name
     var splitValues = colWithFilePaths.split(',');
+    var i = 0;
     splitValues.forEach(function (value) {
 
       // Make a copy of the newRow array
@@ -48,7 +49,13 @@ function onFormSubmit(e) {
       var invoiceNumber = "SUP-INV" + ("00000" + row).slice(-6);
       processedSheet.getRange(processedSheet.getLastRow(), 5).setValue(invoiceNumber); // Col E
 
+      var parts = splitValues[i];
+      var fileID = parts.split("?id=");
+      processedSheet.getRange(processedSheet.getLastRow(), 7).setValue(fileID[1]); // Col G
+      i++;
+
       processedSheet.getRange(processedSheet.getLastRow(), 8).setValue(true); // Col H
     });
+
   }
 }
