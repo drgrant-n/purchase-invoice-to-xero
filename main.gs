@@ -29,8 +29,11 @@ function onFormSubmit(e) {
     var invoiceNumber = "SUP-INV" + ("00000" + row).slice(-6);
     processedSheet.getRange(processedSheet.getLastRow(), 5).setValue(invoiceNumber); // Col E
 
+  var fileID = colWithFilePaths.split("?id=");
+  processedSheet.getRange(processedSheet.getLastRow(), 7).setValue(fileID[1]); // Col G
+
     processedSheet.getRange(processedSheet.getLastRow(), 8).setValue(true); // Col H
-    
+
   } else { // More than one file name
     var splitValues = colWithFilePaths.split(',');
     splitValues.forEach(function (value) {
