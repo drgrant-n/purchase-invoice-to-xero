@@ -15,6 +15,11 @@ function onFormSubmit(e) {
   // If the last column is empty or contains one value
   if (!colWithFilePaths) { // No file names
     processedSheet.appendRow(newRow); // Append the row to 'Processed' sheet
+    // Get the row number for the last row and make the new invoice number
+    var row = processedSheet.getLastRow() - 1;
+    var invoiceNumber = "SUP-INV" + ("00000" + row).slice(-6);
+    processedSheet.getRange(processedSheet.getLastRow(), 5).setValue(invoiceNumber); // Col E
+
     processedSheet.getRange(processedSheet.getLastRow(), 8).setValue(true); // Col H
   } else if (colWithFilePaths.split(',').length === 1) { // One file name
     processedSheet.appendRow(newRow); // Append the row to 'Processed' sheet
@@ -25,6 +30,7 @@ function onFormSubmit(e) {
     processedSheet.getRange(processedSheet.getLastRow(), 5).setValue(invoiceNumber); // Col E
 
     processedSheet.getRange(processedSheet.getLastRow(), 8).setValue(true); // Col H
+    
   } else { // More than one file name
     var splitValues = colWithFilePaths.split(',');
     splitValues.forEach(function (value) {
