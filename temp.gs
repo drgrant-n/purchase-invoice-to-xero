@@ -49,10 +49,10 @@ function onFormSubmit(e) {
 
     const fileName = DriveApp.getFileById(fileID[1]).getName();
     processedSheet.getRange(processedSheet.getLastRow(), 6).setValue(fileName);
-    Utilities.sleep(2000);
+
     var newName = invoiceNumber + '-' + fileName;
     DriveApp.getFileById(fileID[1]).setName(newName);
-
+    
     // Set the value in the 8th column (H) of the last row in the 'Processed' sheet as true.
     processedSheet.getRange(processedSheet.getLastRow(), 8).setValue(true);
   }
@@ -61,6 +61,7 @@ function onFormSubmit(e) {
     var i = 0;
     // Iterate over each file path in the last column of 'newRow'.
     splitValues.forEach(function (value) {
+      Utilities.sleep(1000); // 1 sec delay between each
       // For each file path, create a copy of 'newRow' array, update the last column
       // with the current file path, and append it as a new row to the 'Processed' sheet.
       var newRowValues = newRow.slice();
@@ -71,13 +72,21 @@ function onFormSubmit(e) {
       var row = processedSheet.getLastRow() - 1;
       var invoiceNumber = "SUP-INV" + ("00000" + row).slice(-6);
       processedSheet.getRange(processedSheet.getLastRow(), 5).setValue(invoiceNumber);
-      processedSheet.getRange(processedSheet.getLastRow(), 6).setValue('test');
-      
+
       // Extract the file ID from each file path, and assign it to the corresponding row in 'Processed' sheet.
       var parts = splitValues[i];
       var fileID = parts.split("?id=");
       processedSheet.getRange(processedSheet.getLastRow(), 7).setValue(fileID[1]);
       i++;
+
+      const fileName = DriveApp.getFileById(fileID[1]).getName();
+      processedSheet.getRange(processedSheet.getLastRow(), 6).setValue(fileName);
+
+      // Utilities.sleep(2000);
+      var newName = invoiceNumber + '-' + fileName;
+      DriveApp.getFileById(fileID[1]).setName(newName);
+
+
 
       // Set the value in the 8th column (H) of each new row in the 'Processed' sheet as true.
       processedSheet.getRange(processedSheet.getLastRow(), 8).setValue(true);
