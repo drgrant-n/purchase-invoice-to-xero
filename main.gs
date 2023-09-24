@@ -1,106 +1,59 @@
 function onFormSubmit(e) {
-  // Get the 'Form responses 1' sheet from the event source object,
-  // where form submissions are stored by default.
+  // Access the 'Form responses 1' sheet from the spreadsheet linked to the form
   var formSubmissionSheet = e.source.getSheetByName('Form responses 1');
 
-  // Retrieve the last submitted row in 'Form responses 1' sheet by getting
-  // the last row number and column number and then fetching the range and its values.
+  // Retrieve the latest form submission details from 'Form responses 1'
   var lastRow = formSubmissionSheet.getLastRow();
-  var lastColumn = formSubmissionSheet.getLastColumn();
-  var range = formSubmissionSheet.getRange(lastRow, 1, 1, lastColumn);
-  var values = range.getValues();
-  // Store the values of the last submitted row in the 'newRow' array.
-  var newRow = values[0];
+  var range = formSubmissionSheet.getRange(lastRow, 1, 1, formSubmissionSheet.getLastColumn());
+  var newRow = range.getValues()[0];
 
-  // Get the 'Processed' sheet from the event source object to
-  // store processed form submission data.
+  // Access the 'Processed' sheet from the same spreadsheet
   var processedSheet = e.source.getSheetByName('Processed');
 
-  // Retrieve the content of the last column from 'newRow' assuming it contains file paths.
+  // Retrieve the file paths from the last column of the latest submission
   var colWithFilePaths = newRow[newRow.length - 1];
 
-  // If the last column (containing file paths) is empty or contains one value.
-  if (!colWithFilePaths) { // If there are no file names.
-    // Append the entire 'newRow' array as a new row to the 'Processed' sheet.
-    processedSheet.appendRow(newRow);
-
-    // Generate an invoice number in the format "SUP-INV00000x" using the row number,
-    // where 'x' corresponds to the row number (padded with zeros to maintain the format),
-    // and assign it to the 5th column (E) of the last row in the 'Processed' sheet.
-    var row = processedSheet.getLastRow() - 1;
-    var invoiceNumber = "SUP-INV" + ("00000" + row).slice(-6);
-    processedSheet.getRange(processedSheet.getLastRow(), 5).setValue(invoiceNumber);
-    processedSheet.getRange(processedSheet.getLastRow(), 6).setValue('test');
-    // Set the value in the 8th column (H) of the last row in the 'Processed' sheet as true,
-    // indicating the row has been processed.
-    processedSheet.getRange(processedSheet.getLastRow(), 8).setValue(true);
-  }
-  else if (colWithFilePaths.split(',').length === 1) { // If there is one file name.
-    // Similar to the process above for rows with one file path.
-    processedSheet.appendRow(newRow);
-    var row = processedSheet.getLastRow() - 1;
-    var invoiceNumber = "SUP-INV" + ("00000" + row).slice(-6);
-    processedSheet.getRange(processedSheet.getLastRow(), 5).setValue(invoiceNumber);
-
-    // Extract the file ID from the file path using the split method,
-    // and assign it to the 7th column (G) of the last row in the 'Processed' sheet.
-    var fileID = colWithFilePaths.split("?id=");
-    processedSheet.getRange(processedSheet.getLastRow(), 7).setValue(fileID[1]);
-
-    const fileName = DriveApp.getFileById(fileID[1]).getName();
-    processedSheet.getRange(processedSheet.getLastRow(), 6).setValue(fileName);
-
-    var newName = invoiceNumber + '-' + fileName;
-    DriveApp.getFileById(fileID[1]).setName(newName);
-
-    var recipient = "grant.naylor@kaybe.co.uk";
-    var subject = newName;
-    var body = "See the attached file";
-    var attachedFiles = [DriveApp.getFileById(fileID[1])];
-    MailApp.sendEmail(recipient, subject, body, { attachments: attachedFiles });
-
-    // Set the value in the 8th column (H) of the last row in the 'Processed' sheet as true.
-    processedSheet.getRange(processedSheet.getLastRow(), 8).setValue(true);
-  }
-  else { // If there are more than one file names.
-    var splitValues = colWithFilePaths.split(',');
-    var i = 0;
-    // Iterate over each file path in the last column of 'newRow'.
-    splitValues.forEach(function (value) {
-      Utilities.sleep(1000); // 1 sec delay between each
-      // For each file path, create a copy of 'newRow' array, update the last column
-      // with the current file path, and append it as a new row to the 'Processed' sheet.
-      var newRowValues = newRow.slice();
-      newRowValues[newRowValues.length - 1] = value.trim();
-      processedSheet.appendRow(newRowValues);
-
-      // Similar to the process above for each row with a separate file path.
-      var row = processedSheet.getLastRow() - 1;
-      var invoiceNumber = "SUP-INV" + ("00000" + row).slice(-6);
-      processedSheet.getRange(processedSheet.getLastRow(), 5).setValue(invoiceNumber);
-
-      // Extract the file ID from each file path, and assign it to the corresponding row in 'Processed' sheet.
-      var parts = splitValues[i];
-      var fileID = parts.split("?id=");
-      processedSheet.getRange(processedSheet.getLastRow(), 7).setValue(fileID[1]);
-      i++;
-
-      const fileName = DriveApp.getFileById(fileID[1]).getName();
-      processedSheet.getRange(processedSheet.getLastRow(), 6).setValue(fileName);
-
-      // Utilities.sleep(2000);
-      var newName = invoiceNumber + '-' + fileName;
-      DriveApp.getFileById(fileID[1]).setName(newName);
-
-      Utilities.sleep(1000);
-      var recipient = "grant.naylor@kaybe.co.uk";
-      var subject = newName;
-      var body = "See the attached file";
-      var attachedFiles = [DriveApp.getFileById(fileID[1])];
-      MailApp.sendEmail(recipient, subject, body, { attachments: attachedFiles });
-
-      // Set the value in the 8th column (H) of each new row in the 'Processed' sheet as true.
-      processedSheet.getRange(processedSheet.getLastRow(), 8).setValue(true);
+  if (!colWithFilePaths) {
+    // Process and append the new row to 'Processed' sheet when there are no file paths
+    appendAndProcessRow(processedSheet, newRow, null);
+  } else {
+    var filePaths = colWithFilePaths.split(','); // Split multiple file paths if present
+    filePaths.forEach((filePath, index) => {
+      // Process and append each file path separately to 'Processed' sheet
+      var rowValues = newRow.slice();
+      rowValues[rowValues.length - 1] = filePath.trim();
+      appendAndProcessRow(processedSheet, rowValues, index);
     });
   }
+}
+
+function appendAndProcessRow(sheet, rowValues, index) {
+  // Append the row to the 'Processed' sheet and perform additional processing
+  sheet.appendRow(rowValues);
+  var rowNumber = sheet.getLastRow();
+  
+  // Generate and set the invoice number to the 5th column (E) of the appended row
+  var invoiceNumber = "SUP-INV" + ("00000" + rowNumber).slice(-6);
+  sheet.getRange(rowNumber, 5).setValue(invoiceNumber);
+
+  // Perform additional processing only if a file path is present in the row
+  if (rowValues[rowValues.length - 1]) {
+    var fileID = rowValues[rowValues.length - 1].split("?id=")[1];
+    const fileName = DriveApp.getFileById(fileID).getName();
+    sheet.getRange(rowNumber, 6).setValue(fileName);
+    var newName = invoiceNumber + '-' + fileName;
+    DriveApp.getFileById(fileID).setName(newName);
+    sendEmail(fileID, newName);
+  }
+  
+  // Set the processed flag to true in the 8th column (H) of the appended row
+  sheet.getRange(rowNumber, 8).setValue(true);
+}
+
+function sendEmail(fileID, subject) {
+  // Send an email with the attached file and relevant details
+  var recipient = "grant.naylor@kaybe.co.uk";
+  var body = "See the attached file";
+  var attachedFiles = [DriveApp.getFileById(fileID)];
+  MailApp.sendEmail(recipient, subject, body, { attachments: attachedFiles });
 }
