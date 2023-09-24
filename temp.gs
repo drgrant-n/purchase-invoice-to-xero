@@ -52,6 +52,7 @@ function onFormSubmit(e) {
 
     var newName = invoiceNumber + '-' + fileName;
     DriveApp.getFileById(fileID[1]).setName(newName);
+    Utilities.sleep(1000);
     
     // Set the value in the 8th column (H) of the last row in the 'Processed' sheet as true.
     processedSheet.getRange(processedSheet.getLastRow(), 8).setValue(true);
