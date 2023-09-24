@@ -48,8 +48,10 @@ function onFormSubmit(e) {
     processedSheet.getRange(processedSheet.getLastRow(), 7).setValue(fileID[1]);
 
     const fileName = DriveApp.getFileById(fileID[1]).getName();
-    
     processedSheet.getRange(processedSheet.getLastRow(), 6).setValue(fileName);
+    Utilities.sleep(2000);
+    var newName = invoiceNumber + '-' + fileName;
+    DriveApp.getFileById(fileID[1]).setName(newName);
 
     // Set the value in the 8th column (H) of the last row in the 'Processed' sheet as true.
     processedSheet.getRange(processedSheet.getLastRow(), 8).setValue(true);
@@ -70,6 +72,7 @@ function onFormSubmit(e) {
       var invoiceNumber = "SUP-INV" + ("00000" + row).slice(-6);
       processedSheet.getRange(processedSheet.getLastRow(), 5).setValue(invoiceNumber);
       processedSheet.getRange(processedSheet.getLastRow(), 6).setValue('test');
+      
       // Extract the file ID from each file path, and assign it to the corresponding row in 'Processed' sheet.
       var parts = splitValues[i];
       var fileID = parts.split("?id=");
